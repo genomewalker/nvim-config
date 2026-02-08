@@ -2,6 +2,9 @@
 
 LazyVim-based config optimized for **vibe coding** with Claude Code via [prism.nvim](https://github.com/genomewalker/prism.nvim).
 
+[![prism.nvim](https://img.shields.io/badge/Powered%20by-prism.nvim-orange)](https://github.com/genomewalker/prism.nvim)
+[![LazyVim](https://img.shields.io/badge/Based%20on-LazyVim-blue)](https://lazyvim.org)
+
 ## Quick Install
 
 ```bash
