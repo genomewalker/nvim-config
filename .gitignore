@@ -1,0 +1,19 @@
+# Lazy.nvim generated files (machine-specific)
+lazy-lock.json
+
+# Test and debug files
+.tests
+*.log
+debug
+.repro
+
+# Generated docs
+doc/tags
+
+# Local data
+data
+tt.*
+foo.*
+
+# OS files
+.DS_Store
