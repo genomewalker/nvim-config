@@ -1,8 +1,15 @@
 # Neovim Config
 
-LazyVim-based config with Claude Code integration via [prism.nvim](https://github.com/genomewalker/prism.nvim).
+LazyVim-based config optimized for **vibe coding** with Claude Code via [prism.nvim](https://github.com/genomewalker/prism.nvim).
 
 ## Quick Install
+
+```bash
+# One-liner install
+curl -fsSL https://raw.githubusercontent.com/genomewalker/nvim-config/main/install.sh | bash
+```
+
+Or manually:
 
 ```bash
 # Backup existing config
@@ -11,21 +18,33 @@ mv ~/.config/nvim ~/.config/nvim.bak
 # Clone this repo
 git clone https://github.com/genomewalker/nvim-config.git ~/.config/nvim
 
-# Install prism.nvim for Claude Code integration
-# (Run this in Claude Code terminal)
+# Open Neovim (plugins auto-install)
+nvim
+
+# In Claude Code, install prism.nvim
 /prism install
 ```
 
 ## What's Included
 
-- **LazyVim** - Modern Neovim setup with sensible defaults
-- **Prism.nvim** - Claude Code integration with 55+ MCP tools
-- **Diffview** - Enhanced git diff viewer
-- **Socket registry** - Multi-instance Neovim support
+### Core
+- **[LazyVim](https://lazyvim.org)** - Modern Neovim with sensible defaults
+- **[Prism.nvim](https://github.com/genomewalker/prism.nvim)** - Claude Code integration (65+ MCP tools)
+
+### Productivity Plugins
+- **[Harpoon2](https://github.com/ThePrimeagen/harpoon)** - Quick file switching (pin files, jump instantly)
+- **[Trouble.nvim](https://github.com/folke/trouble.nvim)** - Better diagnostics panel
+- **[Todo-comments](https://github.com/folke/todo-comments.nvim)** - Highlight & search TODOs
+- **[Spectre](https://github.com/nvim-pack/nvim-spectre)** - Project-wide search & replace
+- **[Diffview](https://github.com/sindrets/diffview.nvim)** - Enhanced git diffs
+
+### UI Enhancements
+- **Mini-indentscope** - Visual indent guides
+- **Mini-surround** - Quick surround editing
 
 ## Keybindings
 
-### Claude Code (via Prism)
+### Claude Code (Prism)
 
 | Key | Action |
 |-----|--------|
@@ -35,10 +54,32 @@ git clone https://github.com/genomewalker/nvim-config.git ~/.config/nvim
 | `<leader>ct` | Toggle terminal |
 | `<leader>cs` | Send selection to Claude |
 | `<leader>ca` | Code actions |
-| `<leader>cd` | Show diff |
-| `<leader>cm` | Switch model |
 
-### Git (via Diffview)
+### Harpoon (Quick Files)
+
+| Key | Action |
+|-----|--------|
+| `<leader>a` | Add file to harpoon |
+| `Ctrl+e` | Show harpoon menu |
+| `<leader>1-4` | Jump to file 1-4 |
+
+### Diagnostics & Todos
+
+| Key | Action |
+|-----|--------|
+| `<leader>xx` | Toggle Trouble (diagnostics) |
+| `<leader>xt` | Show all TODOs |
+| `<leader>st` | Search TODOs (Telescope) |
+| `]t` / `[t` | Next/prev TODO |
+
+### Search & Replace
+
+| Key | Action |
+|-----|--------|
+| `<leader>sr` | Open Spectre (project replace) |
+| `<leader>sw` | Replace word under cursor |
+
+### Git
 
 | Key | Action |
 |-----|--------|
@@ -46,37 +87,56 @@ git clone https://github.com/genomewalker/nvim-config.git ~/.config/nvim
 | `<leader>gh` | File history |
 | `<leader>gH` | Repo history |
 
+## Talk to Claude
+
+With prism.nvim, just tell Claude what you want:
+
+```
+"pin this file"           → harpoon_add
+"show pinned files"       → harpoon_list
+"go to harpoon 2"         → harpoon_goto(2)
+"show trouble"            → trouble_toggle
+"find todos"              → search_todos
+"next todo"               → next_todo
+"replace this everywhere" → spectre_word
+```
+
 ## Structure
 
 ```
 ~/.config/nvim/
-├── init.lua                 # Entry point
+├── init.lua
 ├── lua/
 │   ├── config/
-│   │   ├── lazy.lua         # Plugin manager setup
-│   │   ├── options.lua      # Vim options
-│   │   ├── keymaps.lua      # Key bindings
-│   │   └── autocmds.lua     # Auto commands
+│   │   ├── lazy.lua           # Plugin manager + LazyVim extras
+│   │   ├── options.lua
+│   │   ├── keymaps.lua
+│   │   └── autocmds.lua
 │   ├── plugins/
-│   │   └── prism.lua        # Prism.nvim config
+│   │   ├── prism.lua          # Claude Code integration
+│   │   └── productivity.lua   # Harpoon, Trouble, Spectre, etc.
 │   └── claude/
-│       └── init.lua         # Claude Code harness
+│       └── init.lua           # Claude terminal harness
 └── after/plugin/
-    └── prism-socket.lua     # Socket registry for MCP
+    └── prism-socket.lua       # Multi-instance socket registry
 ```
 
 ## Requirements
 
 - Neovim >= 0.9
 - Git
-- Python 3 with msgpack (`pip install msgpack`)
-- [Claude Code](https://claude.com/claude-code)
+- Python 3 + msgpack (`pip install msgpack`)
+- [Nerd Font](https://www.nerdfonts.com/) (for icons)
+- [Claude Code](https://claude.ai/code)
 
 ## Updating
 
 ```bash
-cd ~/.config/nvim
-git pull
+cd ~/.config/nvim && git pull
 ```
 
-Then restart Neovim to apply changes.
+Then restart Neovim. Run `/prism update` in Claude Code if prism.nvim has updates.
+
+## License
+
+MIT
