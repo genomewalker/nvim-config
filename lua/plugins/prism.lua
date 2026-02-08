@@ -16,7 +16,7 @@ return {
           provider = "native",
           position = "vertical",
           width = 0.4,
-          auto_start = false,
+          auto_start = true,
           passthrough = true,
         },
         claude = {
