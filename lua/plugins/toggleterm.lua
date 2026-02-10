@@ -1,18 +1,17 @@
--- Simple terminal below edit buffer (native vim split, respects columns)
+-- Persistent terminal below edit buffer (like Claude terminal)
 return {
   "akinsho/toggleterm.nvim",
   version = "*",
-  lazy = false,  -- Load immediately
+  lazy = false,
   config = function()
+    require("toggleterm").setup({ open_mapping = false })
+
     local term_buf = nil
     local term_win = nil
 
-    local function toggle_term()
-      -- If terminal window exists and is valid, toggle it
+    local function open_term()
       if term_win and vim.api.nvim_win_is_valid(term_win) then
-        vim.api.nvim_win_hide(term_win)
-        term_win = nil
-        return
+        return -- Already open
       end
 
       -- Find edit window (non-terminal, non-prism)
@@ -27,25 +26,69 @@ return {
         end
       end
 
-      if edit_win then
-        vim.api.nvim_set_current_win(edit_win)
-      end
+      if not edit_win then return end
+      vim.api.nvim_set_current_win(edit_win)
 
-      -- Create split below current window (respects column)
+      -- Create split below edit window
       local height = math.floor(vim.o.lines * 0.25)
-      vim.cmd("belowright " .. height .. "split")
+      vim.cmd("below " .. height .. "split")
       term_win = vim.api.nvim_get_current_win()
 
-      -- Reuse or create terminal buffer
+      -- Create or reuse terminal buffer
       if term_buf and vim.api.nvim_buf_is_valid(term_buf) then
         vim.api.nvim_win_set_buf(term_win, term_buf)
       else
         vim.cmd("terminal")
         term_buf = vim.api.nvim_get_current_buf()
       end
+
+      -- Make window persistent (like Claude terminal)
+      vim.wo[term_win].winfixheight = true
+      vim.bo[term_buf].buflisted = false
+
       vim.cmd("startinsert")
     end
 
+    local function close_term()
+      if term_win and vim.api.nvim_win_is_valid(term_win) then
+        vim.api.nvim_win_hide(term_win)
+        term_win = nil
+      end
+    end
+
+    local function toggle_term()
+      if term_win and vim.api.nvim_win_is_valid(term_win) then
+        close_term()
+      else
+        open_term()
+      end
+    end
+
+    -- Keymaps
+    vim.keymap.set({ "n", "t" }, "<C-_>", toggle_term, { desc = "Toggle Terminal" })
     vim.keymap.set({ "n", "t" }, "<C-/>", toggle_term, { desc = "Toggle Terminal" })
+    vim.keymap.set("n", "<leader>tt", toggle_term, { desc = "Toggle Terminal" })
+
+    -- Auto-open on startup (after UI is ready)
+    vim.api.nvim_create_autocmd("VimEnter", {
+      callback = function()
+        vim.defer_fn(open_term, 100)
+      end,
+    })
+
+    -- Restore terminal if accidentally closed by buffer operations
+    vim.api.nvim_create_autocmd("BufEnter", {
+      callback = function()
+        if term_buf and vim.api.nvim_buf_is_valid(term_buf) then
+          -- Check if terminal window still exists
+          if not term_win or not vim.api.nvim_win_is_valid(term_win) then
+            -- Terminal buffer exists but window gone - could reopen here
+            -- For now, just clear the reference
+            term_win = nil
+          end
+        end
+      end,
+    })
   end,
 }
+
