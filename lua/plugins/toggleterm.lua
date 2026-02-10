@@ -1,40 +1,48 @@
--- Toggleterm - horizontal terminal below edit buffer (not over Claude)
+-- Simple terminal below edit buffer (native vim split, respects columns)
 return {
-  "akinsho/toggleterm.nvim",
-  version = "*",
-  keys = {
-    {
-      "<C-/>",
-      function()
-        -- Find a non-terminal, non-prism window to split
-        local wins = vim.api.nvim_tabpage_list_wins(0)
-        for _, win in ipairs(wins) do
-          local buf = vim.api.nvim_win_get_buf(win)
-          local buftype = vim.bo[buf].buftype
-          local bufname = vim.api.nvim_buf_get_name(buf)
-          -- Skip terminal buffers and prism buffer
-          if buftype ~= "terminal" and not bufname:match("prism://") then
-            vim.api.nvim_set_current_win(win)
-            break
-          end
-        end
-        vim.cmd("ToggleTerm")
-      end,
-      desc = "Toggle Terminal",
-    },
-    { "<C-/>", "<cmd>ToggleTerm<cr>", mode = "t", desc = "Toggle Terminal" },
-  },
-  opts = {
-    size = function(term)
-      if term.direction == "horizontal" then
-        return vim.o.lines * 0.25
-      elseif term.direction == "vertical" then
-        return vim.o.columns * 0.4
+  config = function()
+    local term_buf = nil
+    local term_win = nil
+
+    local function toggle_term()
+      -- If terminal window exists and is valid, toggle it
+      if term_win and vim.api.nvim_win_is_valid(term_win) then
+        vim.api.nvim_win_hide(term_win)
+        term_win = nil
+        return
       end
-    end,
-    direction = "horizontal",
-    shade_terminals = false,
-    start_in_insert = true,
-    persist_size = true,
-  },
+
+      -- Find edit window (non-terminal, non-prism)
+      local edit_win = nil
+      for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+        local buf = vim.api.nvim_win_get_buf(win)
+        local bt = vim.bo[buf].buftype
+        local name = vim.api.nvim_buf_get_name(buf)
+        if bt ~= "terminal" and not name:match("prism://") then
+          edit_win = win
+          break
+        end
+      end
+
+      if edit_win then
+        vim.api.nvim_set_current_win(edit_win)
+      end
+
+      -- Create split below current window (respects column)
+      local height = math.floor(vim.o.lines * 0.25)
+      vim.cmd("belowright " .. height .. "split")
+      term_win = vim.api.nvim_get_current_win()
+
+      -- Reuse or create terminal buffer
+      if term_buf and vim.api.nvim_buf_is_valid(term_buf) then
+        vim.api.nvim_win_set_buf(term_win, term_buf)
+      else
+        vim.cmd("terminal")
+        term_buf = vim.api.nvim_get_current_buf()
+      end
+      vim.cmd("startinsert")
+    end
+
+    vim.keymap.set({ "n", "t" }, "<C-/>", toggle_term, { desc = "Toggle Terminal" })
+  end,
 }
