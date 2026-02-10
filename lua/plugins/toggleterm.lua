@@ -2,6 +2,7 @@
 return {
   "akinsho/toggleterm.nvim",
   version = "*",
+  lazy = false,  -- Load immediately
   config = function()
     local term_buf = nil
     local term_win = nil
