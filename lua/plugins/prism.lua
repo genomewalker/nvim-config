@@ -14,8 +14,8 @@ return {
         mcp = { auto_start = false },
         terminal = {
           provider = "native",
-          position = "horizontal",
-          height = 0.5,
+          position = "vertical",
+          width = 0.4,
           auto_start = true,
           passthrough = true,
         },
