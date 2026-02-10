@@ -1,5 +1,7 @@
 -- Simple terminal below edit buffer (native vim split, respects columns)
 return {
+  "akinsho/toggleterm.nvim",
+  version = "*",
   config = function()
     local term_buf = nil
     local term_win = nil
