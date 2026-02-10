@@ -25,6 +25,26 @@ return {
         },
         trust = { mode = "companion" },
       })
+
+      -- Disable mouse when in Claude terminal for copy/paste
+      vim.api.nvim_create_autocmd("BufEnter", {
+        pattern = "term://*",
+        callback = function()
+          local name = vim.api.nvim_buf_get_name(0)
+          if name:match("prism://") or name:match("claude") then
+            vim.opt.mouse = ""
+          end
+        end,
+      })
+      vim.api.nvim_create_autocmd("BufLeave", {
+        pattern = "term://*",
+        callback = function()
+          local name = vim.api.nvim_buf_get_name(0)
+          if name:match("prism://") or name:match("claude") then
+            vim.opt.mouse = "a"
+          end
+        end,
+      })
     end,
     keys = {
       { "<leader>cc", "<cmd>Prism<cr>", desc = "Prism: Open Layout" },
@@ -37,3 +57,4 @@ return {
     },
   },
 }
+
