@@ -19,25 +19,39 @@ vim.g.clipboard = {
 }
 
 -- =============================================================================
--- Terminal Mouse Workflow:
---   1. In terminal INSERT mode (typing): mouse OFF → can select text with mouse
---   2. Press Esc → terminal NORMAL mode: mouse ON → can click to switch windows
---   3. Click where you want → press 'i' to type in terminal again
+-- Terminal Workflow:
+--   - In terminal: mouse OFF (can select text)
+--   - Press Esc: exits to normal mode, mouse ON (can click)
+--   - Press 'i' to go back to terminal insert mode
 -- =============================================================================
 
--- Entering terminal insert mode → disable mouse (allows text selection)
-vim.api.nvim_create_autocmd("ModeChanged", {
-  pattern = "*:t",
+-- Disable mouse when entering ANY terminal buffer
+vim.api.nvim_create_autocmd("BufEnter", {
+  pattern = "term://*",
   callback = function()
     vim.opt.mouse = ""
   end,
 })
 
--- Leaving terminal insert mode → enable mouse (allows clicking to switch)
-vim.api.nvim_create_autocmd("ModeChanged", {
-  pattern = "t:*",
+-- Enable mouse when leaving terminal buffer
+vim.api.nvim_create_autocmd("BufLeave", {
+  pattern = "term://*",
   callback = function()
     vim.opt.mouse = "a"
+  end,
+})
+
+-- Single Esc exits terminal mode AND re-enables mouse
+vim.keymap.set("t", "<Esc>", function()
+  vim.opt.mouse = "a"
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-\\><C-n>", true, false, true), "n", false)
+end, { desc = "Exit terminal mode" })
+
+-- When entering insert mode in terminal, disable mouse again
+vim.api.nvim_create_autocmd("ModeChanged", {
+  pattern = "*:t",
+  callback = function()
+    vim.opt.mouse = ""
   end,
 })
 
@@ -47,14 +61,8 @@ vim.api.nvim_create_autocmd("TermOpen", {
     vim.opt_local.number = false
     vim.opt_local.relativenumber = false
     vim.opt_local.signcolumn = "no"
-    vim.cmd("startinsert")
   end,
 })
-
--- Easy escape from terminal: Esc goes to terminal normal mode
--- (default behavior, but being explicit)
--- Double Esc exits to normal buffer if needed
-vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
 -- Quick paste in terminal mode
 vim.keymap.set("t", "<C-S-v>", function()
