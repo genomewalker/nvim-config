@@ -4,3 +4,17 @@
 
 -- Enable mouse in all modes (allows window resizing by dragging borders)
 vim.opt.mouse = "a"
+
+-- OSC 52 clipboard - copies to local clipboard over SSH (Ghostty supports this)
+vim.opt.clipboard = "unnamedplus"
+vim.g.clipboard = {
+  name = "OSC 52",
+  copy = {
+    ["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+    ["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+  },
+  paste = {
+    ["+"] = require("vim.ui.clipboard.osc52").paste("+"),
+    ["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+  },
+}
